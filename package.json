@@ -1,6 +1,6 @@
 {
   "name": "pangu-hook-components",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "pangu components plugin",
   "main": "index.js",
   "scripts": {

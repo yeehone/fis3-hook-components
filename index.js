@@ -1,17 +1,21 @@
 var path = require('path');
-var componentsInfo, componentsDir;
+var componentsInfo, componentsDir, modulesDir;
 
 
 function onReleaseStart() {
   // 读取组件信息
   componentsInfo = {};
   componentsDir = (fis.config.env().get('component.dir') || 'components/').replace(/\/$/, '');
-
   if (componentsDir.substr(-1) !== '/') {
     componentsDir += '/';
   }
 
-  var files = fis.project.getSourceByPatterns(componentsDir + '*/component.json', {
+  modulesDir = (fis.config.env().get('module.dir') || 'modules/').replace(/\/$/, '');
+  if (modulesDir.substr(-1) !== '/') {
+    modulesDir += '/';
+  }
+
+  var files = fis.project.getSourceByPatterns(componentsDir + '**/component.json', {
     ignore: ['node_modules/**']
   });
   Object.keys(files).forEach(function(subpath) {
@@ -86,14 +90,32 @@ function onFileLookUp(info, file) {
     var subpath = m[2];
     var config = componentsInfo[cName] || {};
     var resolved;
+    var resourcePaths = [];
+    var dir = file ? file.dirname : fis.project.getProjectPath()
 
-    if (subpath) {
-      resolved = findResource('/' + componentsDir + '/' + config.version + cName + '/' + subpath, file ? file.dirname : fis.project.getProjectPath());
+    /*if (subpath) {
+      resolved = findResource('/' + componentsDir + cName + '/' + config.version + '/' + subpath, file ? file.dirname : fis.project.getProjectPath());
     } else {
-      resolved = findResource('/' + componentsDir + '/' + config.version + cName + '/' + (config.main || 'index'), file ? file.dirname : fis.project.getProjectPath());
+      resolved = findResource('/' + componentsDir + cName + '/' + config.version + '/' + (config.main || 'index'), file ? file.dirname : fis.project.getProjectPath());
 
       if (!resolved.file) {
-        resolved = findResource('/' + componentsDir + '/' + config.version + cName + '/' + cName, file ? file.dirname : fis.project.getProjectPath());
+        resolved = findResource('/' + componentsDir + cName + '/' + config.version + '/' + cName, file ? file.dirname : fis.project.getProjectPath());
+      }
+    }*/
+
+    resourcePaths = resourcePaths.concat([
+      '/' + componentsDir + cName + '/' + config.version + '/' + (subpath ? subpath : (config.main || 'index')),
+      '/' + componentsDir + cName + '/' + config.version + '/' + cName,
+      '/' + componentsDir + cName + '/' + (subpath ? subpath : (config.main || 'index')),
+      '/' + componentsDir + cName + '/' + cName,
+      '/' + modulesDir + cName + '/' + (subpath ? subpath : (config.main || 'index')),
+      '/' + modulesDir + cName + '/' + cName
+    ]);
+
+    for (var i = 0; i < resourcePaths.length; i++) {
+      resolved = findResource(resourcePaths[i], dir);
+      if (resolved.file) {
+        break;
       }
     }
 
