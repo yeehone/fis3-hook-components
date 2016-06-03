@@ -88,12 +88,12 @@ function onFileLookUp(info, file) {
     var resolved;
 
     if (subpath) {
-      resolved = findResource('/' + componentsDir+ cName + '/' + subpath, file ? file.dirname : fis.project.getProjectPath());
+      resolved = findResource('/' + componentsDir + '/' + config.version + cName + '/' + subpath, file ? file.dirname : fis.project.getProjectPath());
     } else {
-      resolved = findResource('/' + componentsDir + cName + '/' + (config.main || 'index'), file ? file.dirname : fis.project.getProjectPath());
+      resolved = findResource('/' + componentsDir + '/' + config.version + cName + '/' + (config.main || 'index'), file ? file.dirname : fis.project.getProjectPath());
 
       if (!resolved.file) {
-        resolved = findResource('/' + componentsDir + cName + '/' + cName, file ? file.dirname : fis.project.getProjectPath());
+        resolved = findResource('/' + componentsDir + '/' + config.version + cName + '/' + cName, file ? file.dirname : fis.project.getProjectPath());
       }
     }
 
